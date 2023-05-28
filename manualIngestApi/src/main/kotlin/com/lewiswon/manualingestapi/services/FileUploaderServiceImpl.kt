@@ -2,6 +2,7 @@ package com.lewiswon.manualingestapi.services
 
 import com.lewiswon.manualingestapi.utils.Utils
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.http.codec.multipart.FilePart
@@ -12,6 +13,7 @@ import java.io.File
 import java.nio.file.Paths
 
 @Service
+@Primary
 class FileUploaderServiceImpl :FileUploaderService  {
 
     private val utils = Utils()

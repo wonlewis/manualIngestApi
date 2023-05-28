@@ -13,8 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebFlux
@@ -22,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -29,11 +32,13 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.MediaType
 import org.springframework.http.client.MultipartBodyBuilder
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
+import reactor.core.publisher.Flux
 import java.io.File
 
 @ExtendWith(SpringExtension::class)
@@ -41,8 +46,9 @@ import java.io.File
 @WebFluxTest(FileUploadController::class)
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@SpringBootTest(classes = [FileUploadController::class, FileUploaderService::class])
-//@Import(FileUploaderService::class)
+@Import(FileUploaderServiceImpl::class)
 @ContextConfiguration(classes = [FileUploadController::class, FileUploaderService::class])
+@AutoConfigureWebTestClient
 class FileUploadControllerTest {
 
     @Autowired
@@ -51,8 +57,8 @@ class FileUploadControllerTest {
 //    @Autowired
 //    private lateinit var fileUploaderController: FileUploadController
 
-    @MockBean
-    private lateinit var fileUploaderService : FileUploaderService
+    @SpyBean
+    private lateinit var fileUploaderService : FileUploaderServiceImpl
 
     companion object {
         private val logger
@@ -72,7 +78,6 @@ class FileUploadControllerTest {
     @Test
     @DisplayName("Testing Fileupload Controller")
     fun handleManualFileUpload() {
-
         val filePart1 = File("//Users/lewis/Documents/springfiles/rawfiles/names.csv")
         val filePart2 = File("//Users/lewis/Documents/springfiles/rawfiles/test.json")
         val filePart3 = File("//Users/lewis/Documents/springfiles/rawfiles/output-onlinetools.json")
