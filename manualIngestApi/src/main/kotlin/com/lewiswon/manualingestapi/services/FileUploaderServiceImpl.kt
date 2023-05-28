@@ -2,6 +2,8 @@ package com.lewiswon.manualingestapi.services
 
 import com.lewiswon.manualingestapi.utils.Utils
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -21,6 +23,7 @@ class FileUploaderServiceImpl :FileUploaderService  {
 
     override fun store(filePart: Flux<FilePart>) : Mono<MutableMap<String, String>> {
 
+        logger.info("The filePart at service level is $filePart")
         val taggingId = utils.generateRandomNumber()
         val basePath = "./upload/$taggingId"
         var wrongCount = 0
@@ -29,7 +32,7 @@ class FileUploaderServiceImpl :FileUploaderService  {
         return filePart
                 .doOnNext{ fp ->
                     logger.info("Received File: ${fp.filename()}")
-                    if (utils.getFileExtension(fp.filename())!= "csv") wrongCount++
+                    if (checkCsv(fp)) wrongCount++
                 }
                 .collectList()
                 .doOnNext {
@@ -52,5 +55,9 @@ class FileUploaderServiceImpl :FileUploaderService  {
                     }
                 }.then(Mono.just(returnResult))
 
+    }
+
+    fun checkCsv(filePart: FilePart) : Boolean {
+        return utils.getFileExtension(filePart.filename())!= "csv"
     }
 }
