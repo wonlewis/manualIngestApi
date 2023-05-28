@@ -76,8 +76,8 @@ class FileUploadControllerTest {
 //                .build() }
 
     @Test
-    @DisplayName("Testing Fileupload Controller")
-    fun handleManualFileUpload() {
+    @DisplayName("Testing Fileupload Controller. Expect Bad Request")
+    fun handleManualFileUpload_ExpectBadRequest() {
         val filePart1 = File("//Users/lewis/Documents/springfiles/rawfiles/names.csv")
         val filePart2 = File("//Users/lewis/Documents/springfiles/rawfiles/test.json")
         val filePart3 = File("//Users/lewis/Documents/springfiles/rawfiles/output-onlinetools.json")
@@ -91,6 +91,24 @@ class FileUploadControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .exchange()
+                .expectStatus().isBadRequest
+
+        logger.info("The fileuploader controlller ans is $ans")
+    }
+
+    @Test
+    @DisplayName("Testing Fileupload Controller. Expect isOk")
+    fun handleManualFileUpload_ExpectIsOk() {
+        val filePart1 = File("//Users/lewis/Documents/springfiles/rawfiles/names.csv")
+        val builder = MultipartBodyBuilder()
+        builder.part("file", FileSystemResource(filePart1))
+
+        val ans = webTestClient.put()
+                .uri("/upload/manual")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .exchange()
+                .expectStatus().isOk
 
         logger.info("The fileuploader controlller ans is $ans")
     }
